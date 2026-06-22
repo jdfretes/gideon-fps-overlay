@@ -108,6 +108,11 @@ public partial class App : Application
         using (var yBrush = new SolidBrush(ClrYellow))
             g.FillRectangle(yBrush, 8f, 26f, 16f, 3f);
 
-        return Icon.FromHandle(bmp.GetHicon());
+        // FromHandle no posee el HICON: clonamos para que el Icon sea independiente,
+        // luego destruimos el handle GDI para evitar el leak.
+        nint hIcon = bmp.GetHicon();
+        var icon = (Icon)Icon.FromHandle(hIcon).Clone();
+        Gideon.Interop.NativeMethods.DestroyIcon(hIcon);
+        return icon;
     }
 }

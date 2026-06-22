@@ -129,6 +129,15 @@ public partial class OverlayWindow : Window
 
     private async void OnTick(object? sender, EventArgs e)
     {
+        try
+        {
+            await OnTickAsync();
+        }
+        catch { /* el timer reintenta en el proximo ciclo */ }
+    }
+
+    private async Task OnTickAsync()
+    {
         // Actualizar el texto con el ultimo FPS medido.
         double? fps = _fps.CurrentFps;
         if (fps is { } v)
@@ -166,6 +175,7 @@ public partial class OverlayWindow : Window
             _switching = false;
         }
     }
+
 
     protected override void OnClosed(EventArgs e)
     {

@@ -52,4 +52,3 @@ jobs:
           files: ./publish/Gideon.exe
           draft: false
           prerelease: ${{ contains(github.ref_name, '-') }}
-          generate_release_notes: true

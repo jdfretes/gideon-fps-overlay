@@ -13,9 +13,10 @@ internal sealed class FpsService : IDisposable
     private CancellationTokenSource? _cts;
     private Task? _loop;
     private uint _currentPid;
+    private double? _currentFps;
 
     /// <summary>Ultimo valor de FPS medido, o null si no hay datos para el proceso en foco.</summary>
-    public double? CurrentFps { get; private set; }
+    public double? CurrentFps { get { lock (_gate) return _currentFps; } }
 
     /// <summary>True si PresentMonFps puede operar (Windows + admin).</summary>
     public static bool IsAvailable => FpsInspector.IsAvailable;
@@ -37,30 +38,28 @@ internal sealed class FpsService : IDisposable
             return;
 
         CancellationTokenSource cts = new();
-        lock (_gate)
-        {
-            _currentPid = pid;
-            _cts = cts;
-        }
-
         FpsRequest request = new(pid) { PeriodMillisecond = 500 };
 
-        _loop = Task.Run(async () =>
+        // Crear el Task antes de adquirir el lock para evitar iniciar trabajo dentro de el.
+        var newLoop = Task.Run(async () =>
         {
             try
             {
                 await FpsInspector.StartForeverAsync(request, OnFps, cts.Token).ConfigureAwait(false);
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException) { }
+            catch
             {
-                // Cancelacion esperada al cambiar de proceso.
-            }
-            catch (Exception)
-            {
-                // El proceso no presenta frames (no es una app grafica) o termino. Sin datos.
-                CurrentFps = null;
+                lock (_gate) _currentFps = null;
             }
         });
+
+        lock (_gate)
+        {
+            _currentPid = pid;
+            _cts = cts;
+            _loop = newLoop;
+        }
     }
 
     /// <summary>Detiene la medicion actual y libera la sesion ETW.</summary>
@@ -87,15 +86,15 @@ internal sealed class FpsService : IDisposable
             try { await loop.ConfigureAwait(false); } catch { /* ignore */ }
         }
 
-        try { FpsInspector.StopTraceSession(); } catch { /* ignore */ }
+        try { FpsInspector.StopTraceSession(); } catch { }
 
         cts?.Dispose();
-        CurrentFps = null;
+        lock (_gate) _currentFps = null;
     }
 
     private void OnFps(FpsResult result)
     {
-        CurrentFps = result.IsCanceled ? null : result.Fps;
+        lock (_gate) _currentFps = result.IsCanceled ? null : result.Fps;
     }
 
     public void Dispose()

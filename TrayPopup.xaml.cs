@@ -71,17 +71,23 @@ public partial class TrayPopup : Window
             Enum.TryParse<Corner>(btn.Tag?.ToString(), out var corner))
         {
             _overlay.SetCorner(corner);
-            SettingsService.Save(new AppSettings { Corner = corner });
+            SettingsService.Save(new AppSettings
+            {
+                Corner = corner,
+                OverlayVisible = _overlay.IsVisible,
+            });
             HighlightCorner(corner);
         }
     }
 
     private void OnStartupToggle(object sender, RoutedEventArgs e)
     {
-        if (ChkStartup.IsChecked == true)
-            StartupService.Enable();
-        else
-            StartupService.Disable();
+        bool enable = ChkStartup.IsChecked == true;
+        Task.Run(() =>
+        {
+            if (enable) StartupService.Enable();
+            else        StartupService.Disable();
+        });
     }
 
     private void OnExit(object sender, RoutedEventArgs e) =>
