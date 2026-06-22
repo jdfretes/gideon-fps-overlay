@@ -65,6 +65,11 @@ Gideon muestra los FPS del juego en primer plano directamente sobre tu pantalla,
 
 No requiere instalador ni dependencias adicionales.
 
+> **Windows SmartScreen:** la primera vez que ejecutes Gideon.exe Windows puede mostrar
+> una advertencia de "Editor desconocido". Es normal para apps nuevas sin certificado de firma.
+> Click en "Mas informacion" y luego "Ejecutar de todas formas" para continuar.
+> El codigo fuente es publico y auditable en este repositorio.
+
 ### Opcion B - Compilar desde codigo fuente
 
 ```powershell
