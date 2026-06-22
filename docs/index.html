@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gideon - FPS Overlay</title>
+  <meta name="description" content="Overlay ultraligero de FPS para Windows. Sin inyecciones, sin anti-cheat issues, sin consumo perceptible." />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --green:  #6DC800;
+      --yellow: #F5C800;
+      --red:    #EF4444;
+      --bg:     #0D1117;
+      --bg2:    #161B22;
+      --border: rgba(255,255,255,.08);
+      --text:   #E6EDF3;
+      --muted:  #8B949E;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.6;
+    }
+
+    a { color: var(--green); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 40px;
+      border-bottom: 1px solid var(--border);
+      position: sticky; top: 0;
+      background: rgba(13,17,23,.9);
+      backdrop-filter: blur(12px);
+      z-index: 10;
+    }
+    .nav-logo { font-weight: 700; font-size: 1.1rem; color: var(--green); }
+    .nav-links { display: flex; gap: 24px; font-size: .9rem; }
+    .nav-links a { color: var(--muted); }
+    .nav-links a:hover { color: var(--text); text-decoration: none; }
+
+    .hero {
+      text-align: center;
+      padding: 100px 24px 80px;
+      max-width: 760px;
+      margin: 0 auto;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(109,200,0,.12);
+      border: 1px solid rgba(109,200,0,.3);
+      color: var(--green);
+      font-size: .78rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      padding: 4px 12px;
+      border-radius: 99px;
+      margin-bottom: 24px;
+      text-transform: uppercase;
+    }
+    .hero h1 {
+      font-size: clamp(2.4rem, 6vw, 3.6rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 20px;
+    }
+    .hero h1 span { color: var(--green); }
+    .hero p {
+      font-size: 1.15rem;
+      color: var(--muted);
+      max-width: 520px;
+      margin: 0 auto 36px;
+    }
+    .btn-group { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 28px;
+      border-radius: 8px;
+      font-size: .95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity .15s, transform .15s;
+    }
+    .btn:hover { opacity: .88; transform: translateY(-1px); text-decoration: none; }
+    .btn-primary { background: var(--green); color: #000; }
+    .btn-secondary { background: var(--bg2); border: 1px solid var(--border); color: var(--text); }
+
+    .demo {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 32px;
+      padding: 40px 24px 80px;
+      flex-wrap: wrap;
+    }
+    .demo-panel img {
+      border-radius: 12px;
+      box-shadow: 0 16px 48px rgba(0,0,0,.6);
+      width: 200px;
+    }
+    .demo-screen {
+      position: relative;
+      width: min(640px, 100%);
+      aspect-ratio: 16/9;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      box-shadow: 0 32px 80px rgba(0,0,0,.6);
+    }
+    .demo-fps {
+      position: absolute;
+      top: 16px; right: 16px;
+      font-family: "Consolas", monospace;
+      font-size: 2.4rem;
+      font-weight: 700;
+      color: var(--green);
+      text-shadow: 0 2px 8px rgba(0,0,0,.8);
+    }
+    .demo-label {
+      position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%);
+      font-size: .78rem; color: rgba(255,255,255,.3); letter-spacing: .5px;
+      white-space: nowrap;
+    }
+
+    section { padding: 80px 24px; }
+    .section-title {
+      text-align: center;
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .section-sub {
+      text-align: center;
+      color: var(--muted);
+      margin-bottom: 48px;
+      font-size: 1rem;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+    }
+    .card-label {
+      display: inline-block;
+      background: rgba(109,200,0,.15);
+      color: var(--green);
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+    }
+    .card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 8px; }
+    .card p { font-size: .9rem; color: var(--muted); }
+
+    .fps-demo { max-width: 480px; margin: 0 auto; }
+    .fps-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 20px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+    .fps-num {
+      font-family: "Consolas", monospace;
+      font-size: 2rem;
+      font-weight: 700;
+      min-width: 64px;
+    }
+    .fps-row p { font-size: .9rem; color: var(--muted); }
+
+    .install-box { max-width: 640px; margin: 0 auto; }
+    .code-block {
+      background: #0d1117;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px 24px;
+      font-family: "Consolas", monospace;
+      font-size: .9rem;
+      color: #c9d1d9;
+      overflow-x: auto;
+      margin-bottom: 24px;
+    }
+    .code-block .prompt { color: var(--muted); user-select: none; }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 24px;
+      text-align: center;
+      font-size: .85rem;
+      color: var(--muted);
+    }
+    footer span { color: var(--green); }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-logo">Gideon</div>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#install">Instalar</a>
+      <a href="https://github.com/tu-usuario/gideon">GitHub</a>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <div class="hero-badge">FPS Overlay para Windows</div>
+    <h1>El FPS que <span>siempre quisiste</span><br>sin lo que nunca quisiste</h1>
+    <p>Sin inyecciones. Sin anti-cheat issues. Sin consumo perceptible. Solo el numero, donde lo necesitas.</p>
+    <div class="btn-group">
+      <a class="btn btn-primary" href="https://github.com/tu-usuario/gideon/releases/latest">Descargar Gideon.exe</a>
+      <a class="btn btn-secondary" href="https://github.com/tu-usuario/gideon">Ver en GitHub</a>
+    </div>
+  </div>
+
+  <div class="demo">
+    <div class="demo-screen">
+      <div class="demo-fps">144</div>
+      <div class="demo-label">Tu juego, sin interrupciones</div>
+    </div>
+    <div class="demo-panel">
+      <img src="screenshot.png" alt="Panel de control de Gideon" />
+    </div>
+  </div>
+
+  <section id="features">
+    <div class="section-title">Todo lo que necesitas. Nada mas.</div>
+    <div class="section-sub">Disenado para ser invisible hasta que importa.</div>
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-label">Seguridad</div>
+        <h3>Anti-cheat safe</h3>
+        <p>Usa ETW, el mismo sistema de tracing de Windows. Sin hooks, sin DLL injection. Vanguard, EAC y BattlEye lo ignoran.</p>
+      </div>
+      <div class="card">
+        <div class="card-label">Rendimiento</div>
+        <h3>Ultraligero</h3>
+        <p>Pocos MB de RAM y practicamente 0% de CPU. No vas a notar que esta corriendo.</p>
+      </div>
+      <div class="card">
+        <div class="card-label">Compatibilidad</div>
+        <h3>Todas las GPUs</h3>
+        <p>Intel, AMD y NVIDIA. Los eventos Present los emite Windows, no el driver de la GPU.</p>
+      </div>
+      <div class="card">
+        <div class="card-label">Configuracion</div>
+        <h3>4 esquinas</h3>
+        <p>Elegi donde queres el contador. La posicion se recuerda entre sesiones.</p>
+      </div>
+      <div class="card">
+        <div class="card-label">UX</div>
+        <h3>Click-through</h3>
+        <p>El overlay no captura clicks ni teclas. El mouse pasa directo al juego.</p>
+      </div>
+      <div class="card">
+        <div class="card-label">Comodidad</div>
+        <h3>Arranque automatico</h3>
+        <p>Un toggle en el panel lo activa. Inicia con Windows sin ventana de UAC extra.</p>
+      </div>
+    </div>
+  </section>
+
+  <section style="background: var(--bg2); padding: 80px 24px;">
+    <div class="section-title">El color lo dice todo</div>
+    <div class="section-sub">Un vistazo y sabes como esta el juego.</div>
+    <div class="fps-demo">
+      <div class="fps-row">
+        <div class="fps-num" style="color: var(--green);">144</div>
+        <p><strong style="color:var(--green)">Verde</strong> - todo en orden. 60 FPS o mas.</p>
+      </div>
+      <div class="fps-row">
+        <div class="fps-num" style="color: var(--yellow);">45</div>
+        <p><strong style="color:var(--yellow)">Amarillo</strong> - atencion. Entre 30 y 59 FPS.</p>
+      </div>
+      <div class="fps-row">
+        <div class="fps-num" style="color: var(--red);">18</div>
+        <p><strong style="color:var(--red)">Rojo</strong> - problema. Menos de 30 FPS.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="install">
+    <div class="section-title">Instalacion en 30 segundos</div>
+    <div class="section-sub">Descarga, ejecuta como admin, listo.</div>
+    <div class="install-box">
+      <p style="margin-bottom:16px; color:var(--muted)">Opcion 1 - Ejecutable directo (recomendado):</p>
+      <div style="margin-bottom: 24px;">
+        <a class="btn btn-primary" href="https://github.com/tu-usuario/gideon/releases/latest">Descargar Gideon.exe</a>
+      </div>
+      <p style="margin-bottom:16px; color:var(--muted)">Opcion 2 - Compilar desde codigo fuente:</p>
+      <div class="code-block">
+        <span class="prompt">$ </span>git clone https://github.com/tu-usuario/gideon.git<br>
+        <span class="prompt">$ </span>cd gideon<br>
+        <span class="prompt">$ </span>dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true
+      </div>
+      <p style="font-size:.85rem; color:var(--muted)">Requiere Windows 10/11 y ejecutar como administrador. El UAC lo pide automaticamente.</p>
+    </div>
+  </section>
+
+  <footer>
+    Hecho por <a href="https://github.com/tu-usuario">Juan Fretes</a> -
+    Licencia <a href="https://github.com/tu-usuario/gideon/blob/main/LICENSE">MIT + Commons Clause</a> -
+    <span>Gideon - FPS Overlay</span>
+  </footer>
+
+</body>
+</html>

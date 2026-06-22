@@ -1,0 +1,55 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Publish single-file exe
+        run: |
+          dotnet publish Gideon.csproj `
+            -c Release `
+            -r win-x64 `
+            --self-contained true `
+            -p:PublishSingleFile=true `
+            -p:IncludeNativeLibrariesForSelfExtract=true `
+            -o ./publish
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "Gideon - FPS Overlay ${{ github.ref_name }}"
+          body: |
+            ## Gideon - FPS Overlay ${{ github.ref_name }}
+
+            ### Instalación
+            1. Descargá `Gideon.exe`
+            2. Ejecutá como administrador
+            3. El icono aparece en la bandeja del sistema
+
+            ### Requisitos
+            - Windows 10 / 11 (64-bit)
+            - No requiere .NET instalado (incluido en el ejecutable)
+
+            ---
+            Ver el [sitio web](https://tu-usuario.github.io/gideon) para más info.
+          files: ./publish/Gideon.exe
+          draft: false
+          prerelease: ${{ contains(github.ref_name, '-') }}
+          generate_release_notes: true
