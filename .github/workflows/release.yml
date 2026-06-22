@@ -48,7 +48,7 @@ jobs:
             - No requiere .NET instalado (incluido en el ejecutable)
 
             ---
-            Ver el [sitio web](https://tu-usuario.github.io/gideon) para más info.
+            Ver el [sitio web](https://jdfretes.github.io/gideon-fps-overlay) para más info.
           files: ./publish/Gideon.exe
           draft: false
           prerelease: ${{ contains(github.ref_name, '-') }}

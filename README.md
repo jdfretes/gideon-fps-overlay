@@ -6,11 +6,11 @@
 Sin inyecciones. Sin anti-cheat issues. Sin consumo perceptible de recursos.
 
 [![License](https://img.shields.io/badge/license-MIT%20%2B%20Commons%20Clause-brightgreen)](LICENSE)
-[![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-blue?logo=windows&logoColor=white)](https://github.com/tu-usuario/gideon/releases/latest)
+[![Platform](https://img.shields.io/badge/platform-Windows%2010%2F11-blue?logo=windows&logoColor=white)](https://github.com/jdfretes/gideon-fps-overlay/releases/latest)
 [![.NET](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet)](https://dotnet.microsoft.com)
-[![Release](https://img.shields.io/github/v/release/tu-usuario/gideon?color=6DC800)](https://github.com/tu-usuario/gideon/releases/latest)
+[![Release](https://img.shields.io/github/v/release/jdfretes/gideon-fps-overlay?color=6DC800)](https://github.com/jdfretes/gideon-fps-overlay/releases/latest)
 
-[**Descargar**](https://github.com/tu-usuario/gideon/releases/latest) - [**Sitio web**](https://tu-usuario.github.io/gideon) - [**Reportar bug**](https://github.com/tu-usuario/gideon/issues)
+[**Descargar**](https://github.com/jdfretes/gideon-fps-overlay/releases/latest) - [**Sitio web**](https://jdfretes.github.io/gideon-fps-overlay) - [**Reportar bug**](https://github.com/jdfretes/gideon-fps-overlay/issues)
 
 </div>
 
@@ -59,7 +59,7 @@ Gideon muestra los FPS del juego en primer plano directamente sobre tu pantalla,
 
 ### Opcion A - Descarga directa (recomendado)
 
-1. Ve a [**Releases**](https://github.com/tu-usuario/gideon/releases/latest).
+1. Ve a [**Releases**](https://github.com/jdfretes/gideon-fps-overlay/releases/latest).
 2. Descarga `Gideon.exe`.
 3. Ejecuta como administrador.
 
@@ -68,7 +68,7 @@ No requiere instalador ni dependencias adicionales.
 ### Opcion B - Compilar desde codigo fuente
 
 ```powershell
-git clone https://github.com/tu-usuario/gideon.git
+git clone https://github.com/jdfretes/gideon-fps-overlay.git
 cd gideon
 dotnet build -c Release
 .\bin\Release\net10.0-windows\Gideon.exe
@@ -154,4 +154,4 @@ No esta permitido vender el software ni ofrecer servicios comerciales basados en
 
 ## Contribuciones
 
-Issues y pull requests son bienvenidos. Si encontras un bug o queres proponer una feature, abri un [issue](https://github.com/tu-usuario/gideon/issues).
+Issues y pull requests son bienvenidos. Si encontras un bug o queres proponer una feature, abri un [issue](https://github.com/jdfretes/gideon-fps-overlay/issues).
