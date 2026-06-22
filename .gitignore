@@ -29,7 +29,7 @@ packages/
 publish/
 
 # Claude Code local settings
-.claude/
+.claude
 
 # OS
 Thumbs.db
